@@ -1,44 +1,36 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar"; // Sidebar reused from the previous version
 import apiClient from "../api/apiClient";
-import Sidebar from "../components/Sidebar";
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState({
-    totalPatients: 0,
-    totalTherapists: 0,
-    totalAppointments: 0,
-    recentAppointments: [],
-    topTreatments: [],
-  });
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      setLoading(true);
       try {
         const response = await apiClient.get("/dashboard");
         setDashboardData(response.data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
-        // Placeholder data in case of failure
         setDashboardData({
-          totalPatients: 20,
-          totalTherapists: 5,
-          totalAppointments: 100,
-          recentAppointments: [
-            { id: 1, patientName: "John Doe", date: "2024-11-28" },
-            { id: 2, patientName: "Jane Smith", date: "2024-11-27" },
-            { id: 3, patientName: "Alice Johnson", date: "2024-11-26" },
-          ],
-          topTreatments: [
-            { name: "Physical Therapy", count: 40 },
-            { name: "Sports Therapy", count: 30 },
-            { name: "Kids Therapy", count: 20 },
-          ],
+          upcomingAppointments: [],
+          patientsCount: 0,
+          appointmentsCount: 0,
+          therapistsCount: 0,
         });
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchDashboardData();
   }, []);
+
+  if (loading) {
+    return <div className="text-center text-xl">Loading...</div>;
+  }
 
   return (
     <div className="flex">
@@ -46,60 +38,53 @@ const Dashboard = () => {
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 p-6 bg-gray-100">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
+      <div className="flex-grow p-6 bg-gray-100">
+        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-6">
-          <div className="bg-white shadow-md rounded-lg p-4">
-            <h2 className="text-lg font-semibold text-gray-600">Total Patients</h2>
-            <p className="text-2xl font-bold text-indigo-600">{dashboardData.totalPatients}</p>
+        {/* Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="bg-white p-4 shadow rounded">
+            <h2 className="text-xl font-semibold text-gray-700">Patients</h2>
+            <p className="text-3xl font-bold text-indigo-600">{dashboardData?.patientsCount || 0}</p>
           </div>
-          <div className="bg-white shadow-md rounded-lg p-4">
-            <h2 className="text-lg font-semibold text-gray-600">Total Therapists</h2>
-            <p className="text-2xl font-bold text-indigo-600">{dashboardData.totalTherapists}</p>
+          <div className="bg-white p-4 shadow rounded">
+            <h2 className="text-xl font-semibold text-gray-700">Appointments</h2>
+            <p className="text-3xl font-bold text-indigo-600">{dashboardData?.appointmentsCount || 0}</p>
           </div>
-          <div className="bg-white shadow-md rounded-lg p-4">
-            <h2 className="text-lg font-semibold text-gray-600">Total Appointments</h2>
-            <p className="text-2xl font-bold text-indigo-600">{dashboardData.totalAppointments}</p>
+          <div className="bg-white p-4 shadow rounded">
+            <h2 className="text-xl font-semibold text-gray-700">Therapists</h2>
+            <p className="text-3xl font-bold text-indigo-600">{dashboardData?.therapistsCount || 0}</p>
           </div>
         </div>
 
-        {/* Recent Appointments */}
-        <div className="mt-8">
-          <h2 className="text-xl font-bold text-gray-700 mb-4">Recent Appointments</h2>
-          <div className="bg-white shadow-md rounded-lg p-4">
-            <ul>
-              {dashboardData.recentAppointments.map((appointment) => (
-                <li
-                  key={appointment.id}
-                  className="border-b border-gray-200 py-2 last:border-0"
-                >
-                  <span className="font-semibold">{appointment.patientName}</span>{" "}
-                  <span className="text-gray-500">{appointment.date}</span>
-                </li>
+        {/* Upcoming Appointments */}
+        <h2 className="text-2xl font-bold mb-4">Upcoming Appointments</h2>
+        {dashboardData?.upcomingAppointments?.length > 0 ? (
+          <table className="w-full bg-white shadow rounded">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                <th className="px-4 py-2">#</th>
+                <th className="px-4 py-2">Date</th>
+                <th className="px-4 py-2">Duration</th>
+                <th className="px-4 py-2">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dashboardData.upcomingAppointments.map((appointment, index) => (
+                <tr key={appointment.id} className="text-gray-600">
+                  <td className="border px-4 py-2">{index + 1}</td>
+                  <td className="border px-4 py-2">
+                    {appointment.dateTime ? new Date(appointment.dateTime).toLocaleString() : "N/A"}
+                  </td>
+                  <td className="border px-4 py-2">{appointment.sessionDuration} mins</td>
+                  <td className="border px-4 py-2">{appointment.status || "N/A"}</td>
+                </tr>
               ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Top Treatments */}
-        <div className="mt-8">
-          <h2 className="text-xl font-bold text-gray-700 mb-4">Top Treatments</h2>
-          <div className="bg-white shadow-md rounded-lg p-4">
-            <ul>
-              {dashboardData.topTreatments.map((treatment, index) => (
-                <li
-                  key={index}
-                  className="border-b border-gray-200 py-2 last:border-0 flex justify-between"
-                >
-                  <span>{treatment.name}</span>
-                  <span className="font-semibold text-indigo-600">{treatment.count}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-gray-600">No upcoming appointments available.</p>
+        )}
       </div>
     </div>
   );
