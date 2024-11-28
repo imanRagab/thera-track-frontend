@@ -38,6 +38,13 @@ function Sidebar() {
             <FaClipboard className="mr-2" />
             Patients
           </li>
+        <li
+            className="p-4 hover:bg-blue-700 cursor-pointer flex items-center"
+            onClick={() => navigate("/therapists")}
+          >
+            <FaClipboard className="mr-2" />
+            Therapists
+          </li>
         </ul>
       </nav>
       <div
