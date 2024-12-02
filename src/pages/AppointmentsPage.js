@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import apiClient from "../api/apiClient";
+import DeleteModal from "../components/DeleteModal";
+import Alert from "../components/Alert";
 
 function AppointmentsPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deleteId, setDeleteId] = useState(null); // ID of the appointment to delete
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [alert, setAlert] = useState({ isOpen: false, message: "", type: "" });
   const [error, setError] = useState("");
 
   const fetchAppointments = async () => {
@@ -23,14 +28,41 @@ function AppointmentsPage() {
     fetchAppointments();
   }, []);
 
+    // Open modal and set the ID of the appointment to delete
+    const openModal = (id) => {
+      setDeleteId(id);
+      setIsModalOpen(true);
+    };
+  
+    const closeModal = () => {
+      setDeleteId(null);
+      setIsModalOpen(false);
+    };
+
+    const closeAlert = () => {
+      setAlert({ isOpen: false, message: "", type: "" });
+    };
+  
+
+
   const handleDelete = async (id) => {
     try {
       await apiClient.delete(`/appointments/${id}`);
       setAppointments(appointments.filter((appointment) => appointment.id !== id));
+      setAlert({
+        isOpen: true,
+        message: "Appointment deleted successfully!",
+        type: "success",
+      });
     } catch (error) {
       console.error("Error deleting appointment:", error);
-      alert("Failed to delete appointment.");
+      setAlert({
+        isOpen: true,
+        message: "Failed to delete the appointment.",
+        type: "error",
+      });
     }
+    closeModal();
   };
 
   const handleEdit = (id) => {
@@ -100,7 +132,7 @@ function AppointmentsPage() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(appointment.id)}
+                      onClick={() => openModal(appointment.id)}
                       className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                     >
                       Delete
@@ -110,6 +142,24 @@ function AppointmentsPage() {
               ))}
             </tbody>
           </table>
+        )}
+        {/* Use Modal Component */}
+        <DeleteModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onConfirm={() => {
+            handleDelete(deleteId)
+          }}
+          title="Confirm Deletion"
+          message="Are you sure you want to delete this appointment?"
+        />
+        {/* Alert */}
+        {alert.isOpen && (
+          <Alert
+            message={alert.message}
+            type={alert.type}
+            onClose={closeAlert}
+          />
         )}
       </div>
     </div>
