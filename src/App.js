@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import AppointmentsPage from "./pages/AppointmentsPage";
+import AddAppointmentPage from "./pages/AddAppointmentPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PatientsPage from "./pages/PatientsPage";
 
@@ -22,6 +23,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/appointments" element={<AppointmentsPage />} />
                 <Route path="/patients" element={<PatientsPage />} />
+                <Route path="/appointments/add" element={<AddAppointmentPage />} />
               </Routes>
             </ProtectedRoute>
           }
