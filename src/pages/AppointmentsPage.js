@@ -3,47 +3,56 @@ import Sidebar from "../components/Sidebar";
 import apiClient from "../api/apiClient";
 import DeleteModal from "../components/DeleteModal";
 import Alert from "../components/Alert";
+import { useNavigate } from "react-router-dom";
 
 function AppointmentsPage() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState(null); // ID of the appointment to delete
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [deleteId, setDeleteId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [alert, setAlert] = useState({ isOpen: false, message: "", type: "" });
   const [error, setError] = useState("");
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchAppointments = async () => {
+  const navigate = useNavigate();
+
+  const fetchAppointments = async (page, size) => {
     try {
-      const response = await apiClient.get("/appointments");
-      setAppointments(response.data);
+      const response = await apiClient.get(`/appointments?page=${page}&size=${size}`);
+      const data = response.data;
+      setAppointments(data.content);
+      setTotalPages(data.totalPages);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       setError("Failed to load appointments. Please try again later.");
-    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    fetchAppointments(page, size);
+  }, [page, size]);
 
-    // Open modal and set the ID of the appointment to delete
-    const openModal = (id) => {
-      setDeleteId(id);
-      setIsModalOpen(true);
-    };
-  
-    const closeModal = () => {
-      setDeleteId(null);
-      setIsModalOpen(false);
-    };
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
-    const closeAlert = () => {
-      setAlert({ isOpen: false, message: "", type: "" });
-    };
-  
+  const openModal = (id) => {
+    setDeleteId(id);
+    setIsModalOpen(true);
+  };
 
+  const closeModal = () => {
+    setDeleteId(null);
+    setIsModalOpen(false);
+  };
+
+  const closeAlert = () => {
+    setAlert({ isOpen: false, message: "", type: "" });
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -66,23 +75,7 @@ function AppointmentsPage() {
   };
 
   const handleEdit = (id) => {
-    // Logic for editing an appointment
-    alert(`Edit appointment with ID: ${id}`);
-  };
-
-  const handleAdd = async () => {
-    try {
-      const newAppointment = {
-        dateTime: new Date().toISOString(),
-        sessionDuration: 60,
-        status: "Scheduled",
-      };
-      const response = await apiClient.post("/appointments", newAppointment);
-      setAppointments([...appointments, response.data]);
-    } catch (error) {
-      console.error("Error adding appointment:", error);
-      alert("Failed to add appointment.");
-    }
+    navigate(`/appointments/edit/${id}`);
   };
 
   return (
@@ -91,8 +84,8 @@ function AppointmentsPage() {
       <div className="flex-grow p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Appointments</h1>
         <button
-          onClick={handleAdd}
           className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          onClick={() => navigate("/appointments/add")}
         >
           Add Appointment
         </button>
@@ -115,15 +108,9 @@ function AppointmentsPage() {
               {appointments.map((appointment) => (
                 <tr key={appointment.id} className="hover:bg-gray-100">
                   <td className="border border-gray-300 p-2">{appointment.id}</td>
-                  <td className="border border-gray-300 p-2">
-                    {appointment.dateTime || "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {appointment.sessionDuration} mins
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {appointment.status || "N/A"}
-                  </td>
+                  <td className="border border-gray-300 p-2">{appointment.dateTime || "N/A"}</td>
+                  <td className="border border-gray-300 p-2">{appointment.sessionDuration} mins</td>
+                  <td className="border border-gray-300 p-2">{appointment.status || "N/A"}</td>
                   <td className="border border-gray-300 p-2">
                     <button
                       onClick={() => handleEdit(appointment.id)}
@@ -143,23 +130,38 @@ function AppointmentsPage() {
             </tbody>
           </table>
         )}
-        {/* Use Modal Component */}
+        <div className="flex justify-between items-center mt-4">
+          <button
+            className={`px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 ${
+              page === 0 ? "cursor-not-allowed opacity-50" : ""
+            }`}
+            disabled={page === 0}
+            onClick={() => handlePageChange(page - 1)}
+          >
+            Previous
+          </button>
+          <span>
+            Page {page + 1} of {totalPages}
+          </span>
+          <button
+            className={`px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 ${
+              page + 1 === totalPages ? "cursor-not-allowed opacity-50" : ""
+            }`}
+            disabled={page + 1 === totalPages}
+            onClick={() => handlePageChange(page + 1)}
+          >
+            Next
+          </button>
+        </div>
         <DeleteModal
           isOpen={isModalOpen}
           onClose={closeModal}
-          onConfirm={() => {
-            handleDelete(deleteId)
-          }}
+          onConfirm={() => handleDelete(deleteId)}
           title="Confirm Deletion"
           message="Are you sure you want to delete this appointment?"
         />
-        {/* Alert */}
         {alert.isOpen && (
-          <Alert
-            message={alert.message}
-            type={alert.type}
-            onClose={closeAlert}
-          />
+          <Alert message={alert.message} type={alert.type} onClose={closeAlert} />
         )}
       </div>
     </div>
