@@ -1,15 +1,38 @@
-# TheraTrack Frontend App
+# TheraTrack
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**TheraTrack** is a Java-based application designed to assist therapist companies in efficiently tracking and managing their patients. With a robust backend and a user-friendly frontend, TheraTrack simplifies patient management, enabling better organization and streamlined workflows.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Therapist Management**: Track and manage therapist profiles.
+- **Patient Management**: Organize patient data and track their therapy progress.
+- **RESTful API**: Supports secure and structured API endpoints.
+- **Modern Frontend**: Built with React and styled using Tailwind CSS for a responsive and elegant interface.
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Backend**: Java 21 with Spring Boot
+- **Database**: PostgreSQL
+- **Frontend**: React with Tailwind CSS
+- **API**: RESTful API architecture
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
+
+## Installation and Setup
+
+### Prerequisites
+
+Before running TheraTrack, ensure the following are installed on your system:
+
+1. **Java 21**  
+   Download and install from [Oracle's official site](https://www.oracle.com/java/technologies/javase/jdk21-archive-downloads.html) or use [Amazon Corretto](https://aws.amazon.com/corretto/).
+
+2. **PostgreSQL**  
+   Download and install PostgreSQL from [PostgreSQL official website](https://www.postgresql.org/download/).
+
+3. **Node.js and npm**  
+   Install Node.js (which includes npm) from [Node.js official website](https://nodejs.org/). Recommended version: **LTS (Long-Term Support)**.
+
+---
+**Backend project**
+https://github.com/imanRagab/thera-track/blob/dev/README.md
