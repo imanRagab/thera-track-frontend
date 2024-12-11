@@ -6,6 +6,7 @@ import AddAppointmentPage from "./pages/AddAppointmentPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PatientsPage from "./pages/PatientsPage";
 import EditAppointmentPage from "./pages/EditAppointmentPage";
+import TherapistsPage from "./pages/TherapistsPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/appointments" element={<AppointmentsPage />} />
                 <Route path="/patients" element={<PatientsPage />} />
+                <Route path="/therapists" element={<TherapistsPage />} />
                 <Route path="/appointments/add" element={<AddAppointmentPage />} />
                 <Route path="/appointments/edit/:id" element={<EditAppointmentPage />} />
               </Routes>
