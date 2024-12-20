@@ -1,0 +1,25 @@
+{
+  "short_name": "TheraTrack",
+  "name": "TheraTrack - Patient and Therapist Management",
+  "icons": [
+    {
+      "src": "theratrack-icon.png",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "theratrack-logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "theratrack-logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#4A90E2",
+  "background_color": "#F3F4F6"
+}
